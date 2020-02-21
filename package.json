@@ -1,0 +1,19 @@
+{
+  "name": "Connection_4_Node",
+  "version": "1.0.0",
+  "description": "connect 4 beckend",
+  "main": "index.js",
+  "repository": "https://github.com/ArthurRAmaral/Connection_4_Node.git",
+  "author": "Arthur Rocha Amaral <ruhtraamaral@hotmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.1",
+    "nodemon": "^2.0.2",
+    "socket.io": "^2.3.0"
+  },
+  "scripts": {
+    "start": "nodemon src/index.js"
+  }
+}
