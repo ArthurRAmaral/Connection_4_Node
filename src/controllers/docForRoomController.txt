@@ -1,0 +1,15 @@
+methods:
+  createARoom(req, res)
+  joinRoom(req, res)
+  start(req, res)
+
+Socket.io:
+  req.io.emit("newRoom", room);
+  req.io.emit("join#" + id, room);
+  req.io.emit("started#" + id, room);
+
+Room's status:
+  "waiting"
+  "started"
+  "finished"
+  "expired"

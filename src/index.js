@@ -1,9 +1,7 @@
 const mogoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const multer = require("multer");
 const express = require("express");
-const path = require("path");
 var app = express();
 
 app.use(bodyParser.json());
@@ -12,7 +10,7 @@ const server = require("http").Server(app);
 const io = require("socket.io")(server);
 
 mogoose.connect(
-  "mongodb+srv://aaagram:aaagram@aaagramdata-nmloh.mongodb.net/test?retryWrites=true&w=majority",
+  "mongodb+srv://aaagram:aaagram@aaagramdata-nmloh.mongodb.net/Connect4?retryWrites=true&w=majority",
   {
     useNewUrlParser: true,
     useUnifiedTopology: true
