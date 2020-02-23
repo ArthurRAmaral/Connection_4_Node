@@ -25,11 +25,6 @@ app.use((req, res, next) => {
 
 app.use(cors());
 
-app.post("", (req, res) => {
-  console.log(req.body);
-  return res.send("Foi");
-});
-
 app.use(require("./routes"));
 
 server.listen(3333);

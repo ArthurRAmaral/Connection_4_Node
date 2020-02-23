@@ -8,7 +8,7 @@ const RoomSchema = new mongoose.Schema(
     symobolHost: String,
     symobolGuest: String,
     key: String,
-    roomKey: String,
+    roomUrl: String,
     isFull: Boolean,
     marks: Array,
     status: String
