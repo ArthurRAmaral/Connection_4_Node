@@ -1,7 +1,10 @@
 const express = require("express");
-const routes = new express.Router();
+const multer = require("multer");
+const uploadConfig = require("./config/upload");
 const RoomController = require("./controllers/RoomController");
 
-routes.post("/newroom/create", RoomController.createARoom);
+const routes = new express.Router();
+const upload = multer(uploadConfig);
 
-routes.module.exports = routes;
+routes.post("/createroom", RoomController.createARoom);
+module.exports = routes;
