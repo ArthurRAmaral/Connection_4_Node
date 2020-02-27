@@ -5,12 +5,12 @@ const RoomSchema = new mongoose.Schema(
     roomName: String,
     playerHost: String,
     playerGuest: String,
-    symobolHost: String,
-    symobolGuest: String,
+    symbolHost: String,
+    symbolGuest: String,
     key: String,
     roomUrl: String,
     isFull: Boolean,
-    marks: Array,
+    game: Object,
     status: String
   },
   {

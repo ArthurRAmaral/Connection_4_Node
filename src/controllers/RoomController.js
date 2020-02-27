@@ -55,42 +55,63 @@ const returns = {
   }
 };
 
+async function existThisOpenRoom(roomName) {
+  let exist = (await Room.find()).filter(o => {
+    return o.roomName == roomName && o.status < 3;
+  }).length;
+
+  return exist > 0;
+}
+
+function createMatrix() {
+  var matrix = [];
+  for (var i = 0; i < 7; i++) {
+    matrix[i] = [];
+    for (var j = 0; j < 6; j++) {
+      matrix[i][j] = "";
+    }
+  }
+  return matrix;
+}
+
+function hideKey(room) {
+  const { _doc } = room;
+  const { key, updatedAt, __v, ...onlyReadValeus } = _doc;
+  return onlyReadValeus;
+}
+
+function hideKeyAndGame(room) {
+  const { _doc } = room;
+  const { key, game, updatedAt, __v, ...onlyReadValeus } = _doc;
+  return onlyReadValeus;
+}
+
 module.exports = {
   async createARoom(req, res) {
     let { playerHost, key, roomName } = req.body;
 
-    let exist = (await Room.find()).filter(o => {
-      return o.roomName == roomName && o.status < 3;
-    }).length;
-
-    if (exist > 0) {
+    if (await existThisOpenRoom(roomName)) {
       return res.json(returns.existThisOpenRoom);
-    }
-
-    var matrix = [];
-    for (var i = 0; i < 7; i++) {
-      matrix[i] = [];
-      for (var j = 0; j < 6; j++) {
-        matrix[i][j] = undefined;
-      }
     }
 
     const room = await Room.create({
       roomName,
       playerHost,
       playerGuest: "",
-      symobolHost: "x",
-      symobolGuest: "o",
-      key: key.toLowerCase(),
+      symbolHost: "x",
+      symbolGuest: "o",
+      key: key,
       roomKey: `${roomName.toLowerCase()}-${playerHost.toLowerCase()}`,
       isFull: false,
-      marks: matrix,
+      game: {
+        marks: createMatrix()
+      },
       status: statusArray.waitingGuest
     });
 
     req.io.emit("newRoom", room);
-
-    res.json(room);
+    const r = hideKey(room);
+    res.json(r);
   },
 
   async joinRoom(req, res) {
@@ -102,7 +123,7 @@ module.exports = {
       if (room.status == statusArray.waitingGuest) {
         if (key == room.key) {
           let { playerGuest } = req.body;
-
+          if (playerGuest == room.playerHost) playerGuest += " (2)";
           room.isFull = true;
           room.playerGuest = playerGuest;
           room.status = statusArray.waitingStart;
@@ -154,11 +175,11 @@ module.exports = {
     } else return res.json(returns.notFound);
   },
 
-  async allRoomsWithoutKeys(req, res) {
+  async allRoomsWithoutKeysAndGames(req, res) {
     const rooms = await Room.find().sort("-createdAt");
     const novalista = await rooms.map(({ _doc }) => _doc);
     const retorno = await novalista.map(
-      ({ marks, key, createdAt, updatedAt, __v, ...onlyReadValeus }) =>
+      ({ game, key, createdAt, updatedAt, __v, ...onlyReadValeus }) =>
         onlyReadValeus
     );
     return res.json(retorno);
@@ -184,11 +205,7 @@ module.exports = {
             return res.json(returns.justFinished);
           }
         } else return res.json(returns.wrongKey);
-      } else if (
-        room.status == statusArray.finished ||
-        room.status == statusArray.canceled
-      )
-        return res.json(returns.alreadyFinished);
+      } else return res.json(returns.alreadyFinished);
     } else return res.json(returns.notFound);
   }
 };

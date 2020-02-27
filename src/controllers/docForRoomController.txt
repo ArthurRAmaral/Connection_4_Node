@@ -7,6 +7,8 @@ Socket.io:
   req.io.emit("newRoom", room);
   req.io.emit("join#" + id, room);
   req.io.emit("started#" + id, room);
+  req.io.emit("finished#" + id, room);
+  req.io.emit("canceled#" + id, room);
 
 Room's status:
   "waiting"
