@@ -75,7 +75,7 @@ module.exports = {
 
           await room.save();
 
-          req.io.emit("join#" + id, room);
+          req.io.emit("joined", room);
 
           return res.json(returns.joined);
         } else return res.json(returns.wrongKey);
@@ -120,14 +120,28 @@ module.exports = {
     } else return res.json(returns.roomNotFound);
   },
 
-  async allRoomsWithoutKeysAndGames(req, res) {
+  async allOpenRoomsWithoutKeysAndGames(req, res) {
     const rooms = await Room.find().sort("-createdAt");
-    const novalista = await rooms.map(({ _doc }) => _doc);
-    const retorno = await novalista.map(
+    let novalista = await rooms.map(({ _doc }) => _doc);
+    novalista = await novalista.map(
       ({ marks, key, createdAt, updatedAt, __v, ...onlyReadValeus }) =>
         onlyReadValeus
     );
+
+    const retorno = novalista.filter(room => room.status < 2 && !room.isFull);
+
     return res.json(retorno);
+  },
+
+  async allRoomsWithoutKeysAndGames(req, res) {
+    const rooms = await Room.find().sort("-createdAt");
+    let novalista = await rooms.map(({ _doc }) => _doc);
+    novalista = await novalista.map(
+      ({ marks, key, createdAt, updatedAt, __v, ...onlyReadValeus }) =>
+        onlyReadValeus
+    );
+
+    return res.json(novalista);
   },
 
   async getMyRoom(req, res) {
@@ -149,12 +163,12 @@ module.exports = {
           if (room.status < statusArray.started) {
             room.status = statusArray.canceled;
             await room.save();
-            req.io.emit("canceled#" + id, room);
+            req.io.emit("finished", room);
             return res.json(returns.justCanceled);
           } else {
             room.status = statusArray.finished;
             await room.save();
-            req.io.emit("finished#" + id, room);
+            req.io.emit("finished", room);
             return res.json(returns.justFinished);
           }
         } else return res.json(returns.wrongKey);

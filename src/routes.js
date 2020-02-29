@@ -10,6 +10,8 @@ routes.put("/join/:id", RoomController.joinRoom);
 
 routes.put("/start/:id", RoomController.start);
 
+routes.get("/allopenrooms", RoomController.allOpenRoomsWithoutKeysAndGames);
+
 routes.get("/allrooms", RoomController.allRoomsWithoutKeysAndGames);
 
 routes.put("/finish/:id", RoomController.finish);
