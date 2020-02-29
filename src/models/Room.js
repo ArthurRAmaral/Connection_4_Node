@@ -10,7 +10,7 @@ const RoomSchema = new mongoose.Schema(
     key: String,
     roomUrl: String,
     isFull: Boolean,
-    game: Object,
+    marks: Array,
     status: String
   },
   {

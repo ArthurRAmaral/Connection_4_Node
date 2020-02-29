@@ -1,59 +1,6 @@
 const Room = require("../models/Room");
-
-const statusArray = {
-  waitingGuest: 0,
-  waitingStart: 1,
-  started: 2,
-  finished: 3,
-  canceled: 4
-};
-
-const returns = {
-  joined: {
-    status: 0,
-    statusMsg: "joined"
-  },
-  full: {
-    status: 1,
-    statusMsg: "full"
-  },
-  alreadyStarted: {
-    status: 2,
-    statusMsg: "already started"
-  },
-  wrongKey: {
-    status: 3,
-    statusMsg: "wrong key"
-  },
-  notFound: {
-    status: 4,
-    statusMsg: "room not found"
-  },
-  alreadyFinished: {
-    status: 5,
-    statusMsg: "already finished"
-  },
-  notPrepared: {
-    status: 6,
-    statusMsg: "need another player"
-  },
-  justStarted: {
-    status: 7,
-    statusMsg: "just started"
-  },
-  justFinished: {
-    status: 8,
-    statusMsg: "just finished"
-  },
-  existThisOpenRoom: {
-    status: 9,
-    statusMsg: "already exist a room with this name"
-  },
-  justCanceled: {
-    status: 10,
-    statusMsg: "just canceled"
-  }
-};
+const statusArray = require("../utils/roomStatus");
+const returns = require("../messages/returns");
 
 async function existThisOpenRoom(roomName) {
   let exist = (await Room.find()).filter(o => {
@@ -103,9 +50,7 @@ module.exports = {
       key: key,
       roomKey: `${roomName.toLowerCase()}-${playerHost.toLowerCase()}`,
       isFull: false,
-      game: {
-        marks: createMatrix()
-      },
+      marks: createMatrix(),
       status: statusArray.waitingGuest
     });
 
@@ -144,7 +89,7 @@ module.exports = {
         room.status == statusArray.started
       )
         return res.json(returns.full);
-    } else return res.json(returns.notFound);
+    } else return res.json(returns.roomNotFound);
   },
 
   async start(req, res) {
@@ -172,17 +117,25 @@ module.exports = {
         return res.json(returns.notPrepared);
       else if (room.status == statusArray.started)
         return res.json(returns.alreadyStarted);
-    } else return res.json(returns.notFound);
+    } else return res.json(returns.roomNotFound);
   },
 
   async allRoomsWithoutKeysAndGames(req, res) {
     const rooms = await Room.find().sort("-createdAt");
     const novalista = await rooms.map(({ _doc }) => _doc);
     const retorno = await novalista.map(
-      ({ game, key, createdAt, updatedAt, __v, ...onlyReadValeus }) =>
+      ({ marks, key, createdAt, updatedAt, __v, ...onlyReadValeus }) =>
         onlyReadValeus
     );
     return res.json(retorno);
+  },
+
+  async getMyRoom(req, res) {
+    const { id } = req.body;
+    const room = await Room.findById(id);
+    const { _doc } = romm;
+    const { key, ...visibleContent } = room;
+    return res.json(visibleContent);
   },
 
   async finish(req, res) {
@@ -206,6 +159,6 @@ module.exports = {
           }
         } else return res.json(returns.wrongKey);
       } else return res.json(returns.alreadyFinished);
-    } else return res.json(returns.notFound);
+    } else return res.json(returns.roomNotFound);
   }
 };
