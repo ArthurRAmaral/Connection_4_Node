@@ -14,6 +14,8 @@ routes.get("/allopenrooms", RoomController.allOpenRoomsWithoutKeysAndGames);
 
 routes.get("/allrooms", RoomController.allRoomsWithoutKeysAndGames);
 
+routes.get("/myroom/:id", RoomController.getMyRoom);
+
 routes.put("/finish/:id", RoomController.finish);
 
 routes.post("/postplay", GameController.putInColum);

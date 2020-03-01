@@ -147,10 +147,10 @@ module.exports = {
   },
 
   async getMyRoom(req, res) {
-    const { id } = req.body;
+    const { id } = req.params;
     const room = await Room.findById(id);
-    const { _doc } = romm;
-    const { key, ...visibleContent } = room;
+    const { _doc } = room;
+    const { key, ...visibleContent } = _doc;
     return res.json(visibleContent);
   },
 
