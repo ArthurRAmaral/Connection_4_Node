@@ -68,6 +68,8 @@ module.exports = {
       if (room.status == statusArray.waitingGuest) {
         if (key == room.key) {
           let { playerGuest } = req.body;
+          if (playerGuest === undefined)
+            return res.json(returns.emptyGuestNick);
           if (playerGuest == room.playerHost) playerGuest += " (2)";
           room.isFull = true;
           room.playerGuest = playerGuest;

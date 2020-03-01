@@ -42,5 +42,9 @@ module.exports = {
   justCanceled: {
     status: 10,
     statusMsg: "just canceled"
+  },
+  emptyGuestNick: {
+    status: 11,
+    statusMsg: "can't use this empty nickname"
   }
 };
