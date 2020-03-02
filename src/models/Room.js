@@ -11,7 +11,9 @@ const RoomSchema = new mongoose.Schema(
     roomUrl: String,
     isFull: Boolean,
     marks: Array,
-    status: String
+    status: String,
+    move: Number,
+    turnOf: String
   },
   {
     timestamps: true

@@ -48,6 +48,7 @@ module.exports = {
       symbolHost: "x",
       symbolGuest: "o",
       key: key,
+      move: 0,
       roomKey: `${roomName.toLowerCase()}-${playerHost.toLowerCase()}`,
       isFull: false,
       marks: createMatrix(),
@@ -56,7 +57,7 @@ module.exports = {
 
     req.io.emit("newRoom", room);
     const r = hideKey(room);
-    res.json(r);
+    res.json(await r);
   },
 
   async joinRoom(req, res) {
@@ -78,6 +79,8 @@ module.exports = {
           await room.save();
 
           req.io.emit("joined", room);
+
+          req.io.emit("joined#" + id, room);
 
           return res.json(returns.joined);
         } else return res.json(returns.wrongKey);
@@ -103,6 +106,8 @@ module.exports = {
       if (room.status == statusArray.waitingStart) {
         if (key == room.key) {
           room.status = statusArray.started;
+
+          room.turnOf = room.playerHost;
 
           await room.save();
 
