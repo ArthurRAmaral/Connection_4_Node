@@ -13,7 +13,8 @@ const RoomSchema = new mongoose.Schema(
     marks: Array,
     status: String,
     move: Number,
-    turnOf: String
+    turnOf: String,
+    result: Object
   },
   {
     timestamps: true

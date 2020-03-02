@@ -46,5 +46,9 @@ module.exports = {
   emptyGuestNick: {
     status: 11,
     statusMsg: "can't use this empty nickname"
+  },
+  notYourTurn: {
+    status: 12,
+    statusMsg: "is not your turn"
   }
 };
