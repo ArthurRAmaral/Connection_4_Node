@@ -1,6 +1,7 @@
 const Room = require("../models/Room");
 const statusArray = require("../utils/roomStatus");
 const returns = require("../messages/returns");
+const roomHider = require("../utils/roomHider");
 
 async function existThisOpenRoom(roomName) {
   let exist = (await Room.find()).filter(o => {
@@ -19,18 +20,6 @@ function createMatrix() {
     }
   }
   return matrix;
-}
-
-function hideKey(room) {
-  const { _doc } = room;
-  const { key, updatedAt, __v, ...onlyReadValeus } = _doc;
-  return onlyReadValeus;
-}
-
-function hideKeyAndGame(room) {
-  const { _doc } = room;
-  const { key, game, updatedAt, __v, ...onlyReadValeus } = _doc;
-  return onlyReadValeus;
 }
 
 module.exports = {
@@ -56,7 +45,7 @@ module.exports = {
     });
 
     req.io.emit("newRoom", room);
-    const r = hideKey(room);
+    const r = roomHider.hideKey(room);
     res.json(await r);
   },
 

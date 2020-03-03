@@ -8,55 +8,81 @@ function verifyTheGame(n, marks) {
   let i;
   let j;
 
-  for (i = 0; i < 6; i++) {
-    for (j = 0; j < 4; j++) {
-      //testar 4 em linha linhas
+  const res = {
+    symbol: "",
+    i: [],
+    j: []
+  };
+
+  for (i = 0; i < marks.length; i++) {
+    for (j = 0; j < marks[i].length - 3; j++) {
+      //testing columns
       if (
         marks[i][j] == marks[i][j + 1] &&
         marks[i][j + 2] == marks[i][j + 3] &&
         marks[i][j] == marks[i][j + 3] &&
         marks[i][j] != ""
-      )
-        return marks[i][j];
+      ) {
+        res.i = [i, i, i, i];
+        res.j = [j, j + 1, j + 2, j + 3];
+        res.symbol = marks[i][j];
+
+        return res;
+      }
     }
   }
 
-  for (i = 0; i < 6; i++) {
-    for (j = 0; j < 4; j++) {
-      //testar 4 em linha nas colunas
+  for (i = 0; i < marks.length - 3; i++) {
+    for (j = 0; j < marks[i].length; j++) {
+      //testing lines
       if (
-        marks[j][i] == marks[j + 1][i] &&
-        marks[j + 2][i] == marks[j + 3][i] &&
-        marks[j][i] == marks[j + 2][i] &&
-        marks[j][i] != ""
-      )
-        return marks[j][i];
+        marks[i][j] == marks[i + 1][j] &&
+        marks[i + 2][j] == marks[i + 3][j] &&
+        marks[i][j] == marks[i + 2][j] &&
+        marks[i][j] != ""
+      ) {
+        res.i = [i, i + 1, i + 2, i + 3];
+        res.j = [j, j, j, j];
+        res.symbol = marks[i][j];
+
+        return res;
+      }
     }
   }
 
-  for (i = 0; i < 4; i++) {
-    for (j = 0; j < 3; j++) {
-      //testar 4 em linha diagonais1 começar em cima
+  for (i = 0; i < marks.length - 3; i++) {
+    for (j = 0; j < marks[i].length - 3; j++) {
+      //testing / diagonals
       if (
-        marks[j][i] == marks[j + 1][i + 1] &&
-        marks[j + 2][i + 2] == marks[j + 3][i + 3] &&
-        marks[j][i] == marks[j + 2][i + 2] &&
-        marks[j][i] != ""
-      )
-        return marks[j][i];
+        marks[i][j] == marks[i + 1][j + 1] &&
+        marks[i + 2][j + 2] == marks[i + 3][j + 3] &&
+        marks[i][j] == marks[i + 2][j + 2] &&
+        marks[i][j] != ""
+      ) {
+        res.i = [i, i + 1, i + 2, i + 3];
+        res.j = [j, j + 1, j + 2, j + 3];
+        res.symbol = marks[i][j];
+
+        return res;
+      }
     }
   }
 
-  for (i = 0; i < 4; i++) {
-    for (j = 5; j > 2; j--) {
-      //testar 4 em linha diagonais2 começar em baixo
+  for (i = 0; i < marks.length - 3; i++) {
+    for (j = 3; j < marks[i].length; j++) {
+      //testing \ diagonals
       if (
-        marks[j][i] == marks[j - 1][i + 1] &&
-        marks[j - 2][i + 2] == marks[j - 3][i + 3] &&
-        marks[j][i] == marks[j - 2][i + 2] &&
-        marks[j][i] != ""
-      )
-        return marks[j][i];
+        marks[i][j] == marks[i + 1][j - 1] &&
+        marks[i + 2][j - 2] == marks[i + 3][j - 3] &&
+        marks[i][j] == marks[i + 2][j - 2] &&
+        marks[i][j] != ""
+      ) {
+        res.i = [i, i + 1, i + 2, i + 3];
+        res.j = [j, j - 1, j - 2, j - 3];
+        res.symbol = marks[i][j];
+
+        return res;
+      }
     }
   }
 
@@ -86,26 +112,29 @@ module.exports = {
 
       const result = {
         win: "",
-        wasDraw: false
+        wasDraw: false,
+        i: [],
+        j: []
       };
 
-      switch (verify) {
+      switch (verify.symbol) {
         case "x":
           result.win = room.playerHost;
-          req.io.emit("gameover#" + id, result);
+          result.i = verify.i;
+          result.j = verify.j;
           room.result = result;
           room.status = statusArray.finished;
           break;
         case "o":
+          result.i = verify.i;
+          result.j = verify.j;
           result.win = room.playerGuest;
-          req.io.emit("gameover#" + id, result);
           room.result = result;
           room.status = statusArray.finished;
           break;
         case "d":
           result.win = "nobody";
           result.wasDraw = true;
-          req.io.emit("gameover#" + id, result);
           room.result = result;
           room.status = statusArray.finished;
           break;
@@ -118,7 +147,9 @@ module.exports = {
 
       await Room.findByIdAndUpdate(id, room);
 
-      req.io.emit("play#" + id, room);
+      if (result.win !== "") {
+        req.io.emit("gameover#" + id, room);
+      } else req.io.emit("play#" + id, room);
 
       return res.json(room);
     } else if (room.turnOf !== player) return res.json(returns.notYourTurn);
