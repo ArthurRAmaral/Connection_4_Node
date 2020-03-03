@@ -38,15 +38,15 @@ module.exports = {
       symbolGuest: "o",
       key: key,
       move: 0,
-      roomKey: `${roomName.toLowerCase()}-${playerHost.toLowerCase()}`,
       isFull: false,
       marks: createMatrix(),
       status: statusArray.waitingGuest
     });
 
-    req.io.emit("newRoom", room);
-    const r = roomHider.hideKey(room);
-    res.json(await r);
+    const r = await roomHider.hideKey(room);
+
+    req.io.emit("newRoom", r);
+    res.json(r);
   },
 
   async joinRoom(req, res) {
@@ -67,9 +67,11 @@ module.exports = {
 
           await room.save();
 
-          req.io.emit("joined", room);
+          const r = roomHider.hideKey(room);
 
-          req.io.emit("joined#" + id, room);
+          req.io.emit("joined", r);
+
+          req.io.emit("joined#" + id, r);
 
           return res.json(returns.joined);
         } else return res.json(returns.wrongKey);
@@ -100,7 +102,9 @@ module.exports = {
 
           await room.save();
 
-          req.io.emit("started#" + id, room);
+          const r = roomHider.hideKey(room);
+
+          req.io.emit("started#" + id, r);
 
           return res.json(returns.justStarted);
         } else return res.json(returns.wrongKey);
@@ -143,9 +147,9 @@ module.exports = {
   async getMyRoom(req, res) {
     const { id } = req.params;
     const room = await Room.findById(id);
-    const { _doc } = room;
-    const { key, ...visibleContent } = _doc;
-    return res.json(visibleContent);
+    const r = roomHider.hideKey(room);
+
+    return res.json(r);
   },
 
   async finish(req, res) {
@@ -159,16 +163,22 @@ module.exports = {
           if (room.status < statusArray.started) {
             room.status = statusArray.canceled;
             await room.save();
-            req.io.emit("finished", room);
+            const r = roomHider.hideKey(room);
+            req.io.emit("finished", r);
             return res.json(returns.justCanceled);
           } else {
             room.status = statusArray.finished;
             await room.save();
-            req.io.emit("finished", room);
+            const r = roomHider.hideKey(room);
+            req.io.emit("finished", r);
             return res.json(returns.justFinished);
           }
         } else return res.json(returns.wrongKey);
       } else return res.json(returns.alreadyFinished);
     } else return res.json(returns.roomNotFound);
+  },
+
+  async restart(req, res) {
+    req.body;
   }
 };

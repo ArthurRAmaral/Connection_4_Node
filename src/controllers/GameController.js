@@ -2,6 +2,8 @@ const Room = require("../models/Room");
 const statusArray = require("../utils/roomStatus");
 const returns = require("../messages/returns");
 
+const roomHider = require("../utils/roomHider");
+
 function verifyTheGame(n, marks) {
   //objectivo: avaliar se o jogo acabou (4emlinha empate) ou nao
 
@@ -147,11 +149,13 @@ module.exports = {
 
       await Room.findByIdAndUpdate(id, room);
 
-      if (result.win !== "") {
-        req.io.emit("gameover#" + id, room);
-      } else req.io.emit("play#" + id, room);
+      const readbleValues = roomHider.hideKey(room);
 
-      return res.json(room);
+      if (result.win !== "") {
+        req.io.emit("gameover#" + id, readbleValues);
+      } else req.io.emit("play#" + id, readbleValues);
+
+      return res.json(readbleValues);
     } else if (room.turnOf !== player) return res.json(returns.notYourTurn);
     else return res.json(returns.roomNotFound);
   }

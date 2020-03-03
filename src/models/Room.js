@@ -8,7 +8,6 @@ const RoomSchema = new mongoose.Schema(
     symbolHost: String,
     symbolGuest: String,
     key: String,
-    roomUrl: String,
     isFull: Boolean,
     marks: Array,
     status: Number,
