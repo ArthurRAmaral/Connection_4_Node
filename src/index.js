@@ -27,4 +27,4 @@ app.use(cors(process.env.CORS_URL_ALLOWED));
 
 app.use(require("./routes"));
 
-server.listen(process.env.APP_PORT);
+server.listen(process.env.PORT || process.env.APP_PORT);
