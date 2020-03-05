@@ -1,5 +1,5 @@
 {
-  "name": "Connection_4_Node",
+  "name": "connect4-node",
   "version": "1.0.0",
   "description": "connect 4 beckend",
   "main": "index.js",
