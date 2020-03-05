@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -9,13 +11,10 @@ app.use(bodyParser.json());
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
 
-mongoose.connect(
-  "mongodb+srv://aaagram:aaagram@aaagramdata-nmloh.mongodb.net/Connect4?retryWrites=true&w=majority",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  }
-);
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 mongoose.set("useFindAndModify", false);
 
 app.use((req, res, next) => {
@@ -24,8 +23,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors());
+app.use(cors(process.env.CORS_URL_ALLOWED));
 
 app.use(require("./routes"));
 
-server.listen(3333);
+server.listen(process.env.APP_PORT);
